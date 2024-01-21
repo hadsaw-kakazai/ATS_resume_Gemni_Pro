@@ -27,6 +27,7 @@ def input_pdf_setup(file):
         pdf_parts = [
             {'mime_type' :"image/jpeg",
              "data":base64.b64encode(image_byte_arr).decode()
+             
              }
             ] 
         return pdf_parts
@@ -37,7 +38,7 @@ def input_pdf_setup(file):
 # Creating frontend part
      
 st.set_page_config(page_title = "ATS Resume with Gemini Pro Vision")
-st.header("ATS Resume Matching and Creating Resume")
+st.header("ATS Resume Checker")
 
 # input
 input = st.text_area("Enter Job Descrition", key='input')
@@ -45,32 +46,63 @@ uplaoded_file =  st.file_uploader("Upload your resume here must be in pdf format
 
 if uplaoded_file is not None:
     st.write("You have successfully uploaded your file...")
-    submit_btn_1 = st.button("Tell me about the resume")
+    submit_btn_1 = st.button("Tell me about my resume")
     submit_btn_2 = st.button("How can I prove my skills")
-    submit_btn_4 = st.button("Percentage match")
+    submit_btn_3 = st.button("Percentage match")
     input_prompt1 = """
-        You are an experienced HR with Tech Experience in the field of data science, full stack web development, AI, Big Data Engineering, DevOps, data analyst
-        your task is to review the provided resume against the job description for these profiles. 
-        Please share your professional evaluation on whether the candidate's profile aligns with the role. 
-        Highlight the strengths and weaknesses of the applicant in relation to the specified job requirements.
+        You are an experienced HR with Tech Experience in different fields.
+        your task is to review the provided resume against the job description and tell me is I am a good fit for this job position.
+        Highlight the strengths and weaknesses of the applicant in relation to the specified job requirements in bullet points.
         """
-    # input_prompt3 = """
-    #     You are an Technical Human Resource Manager with experience in data science, full stack web development, AI, Big Data Engineering, DevOps, data analyst.
-    #     Your role is to scrutinize the resume in the light of the job description provided. 
-    #     Share your insight on the candidate's suitability for the role from HR perspective.
-    #     Additionally, offer advice on ehancing candidate's skill
-    #     """
+    input_prompt2 = """
+        You are an experienced ATS (Applicant Tracking System) and resume checker.
+        You need to extract the skills from the job description.
+        You must tell the candidate what skills are missing in the resume and how and where he/she can improve the skills,
+        also share the links where he/she can learn those missing skils
+        """
 
     input_prompt3 = """
-        You are an skilled ATS (Applicant Tracking System) scanner with a deep understanding of data science , full stack web development, AI, Big Data Engineering, DevOps, data analyst and deep ATS functionality, 
-        your task is to evaluate the resume against the provided job description. give me the percentage of match if the resume matches
-        the job description. First the output should come as percentage and then keywords missing and last final thoughts.
+You are an experienced ATS (Applicant Tracking System) scanner with an in-depth understanding of ATS functionality. Your goal is to develop a system that extracts keywords or skills from a candidate's resume and matches them with a given job description. The output should be presented in the following format:
+
+Percentage Match:
+
+Generate a percentage indicating the match between the candidate's resume and the job description based on the extracted keywords or skills.
+Keywords Missing:
+
+Identify and list the keywords or skills from the job description that are missing in the candidate's resume.
+Final Thoughts:
+
+Provide a summary or analysis of the overall compatibility between the candidate and the job based on the keyword matching process.
+Visualization:
+
+Create a chart for better visualization of the keyword matching results. You may consider using a chart to display the match percentage and highlight the missing keywords.
+Example Input:
+
+Candidate's Resume: [Input text]
+Job Description: [Input text]
+
+Example Output:
+
+Percentage Match: 75%
+Keywords Missing: [List of missing keywords]
+Final Thoughts: The candidate demonstrates a strong match with the job requirements, but improvements can be made by incorporating the missing keywords.
+
+Ensure the generated output is clear, concise, and effectively communicates the match analysis between the candidate's resume and the job description.
         """
     
     if submit_btn_1:
         if uplaoded_file is not None:
             pdf_content = input_pdf_setup(uplaoded_file)
-            response = get_gemini_response(input,pdf_content,input_prompt1)
+            response = get_gemini_response("Job Description"+input,pdf_content,input_prompt1)
+            st.subheader("Response:")
+            st.write(response)
+        else:
+            st.write("please upload resume..")
+
+    elif submit_btn_3:
+        if uplaoded_file is not None:
+            pdf_content = input_pdf_setup(uplaoded_file)
+            response = get_gemini_response("Job Description"+input,pdf_content,input_prompt3)
             st.subheader("Response:")
             st.write(response)
         else:
@@ -79,7 +111,7 @@ if uplaoded_file is not None:
     elif submit_btn_2:
         if uplaoded_file is not None:
             pdf_content = input_pdf_setup(uplaoded_file)
-            response = get_gemini_response(input,pdf_content,input_prompt3)
+            response = get_gemini_response("Job Description"+input,pdf_content,input_prompt2)
             st.subheader("Response:")
             st.write(response)
         else:
